@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { SYSTEM_PROMPT, tools, type ChatMessage } from "@/lib/agent";
 import { allowMessage, visitorHash } from "@/lib/rate-limit";
+import { trimAfterAnswer } from "@/lib/trim-stream";
 import { requireEnv } from "@/lib/env";
 
 export const maxDuration = 30;
@@ -81,6 +82,7 @@ export async function POST(req: Request) {
     stopWhen: isStepCount(3),
     maxOutputTokens: 300, // hard cap on answer length (and cost)
     temperature: 0.2, // low = consistent, factual answers
+    experimental_transform: trimAfterAnswer(),
   });
 
   return createUIMessageStreamResponse({

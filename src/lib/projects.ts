@@ -32,10 +32,19 @@ export async function searchProjects(input: {
   skills: string[];
   industry?: string;
 }): Promise<Project[]> {
+  const keywords = input.keywords.map((k) => k.trim()).filter(Boolean);
+  const skills = input.skills.map((k) => k.trim()).filter(Boolean);
+  const industry = input.industry?.trim() || null;
+
+  // No criteria = "show me everything" (e.g. "tell me about your projects").
+  if (keywords.length === 0 && skills.length === 0 && !industry) {
+    return getProjects();
+  }
+
   const { data, error } = await getSupabase().rpc("search_projects", {
-    keywords: input.keywords,
-    skills: input.skills,
-    industry_filter: input.industry ?? null,
+    keywords,
+    skills,
+    industry_filter: industry,
   });
 
   if (error) {
