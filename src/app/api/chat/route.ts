@@ -68,9 +68,10 @@ export async function POST(req: Request) {
   const mistral = createMistral({ apiKey: requireEnv("MISTRAL_API_KEY") });
 
   const result = streamText({
-    // mistral-medium: fast, good at tool calls. Reasoning OFF: reasoning
-    // tokens would eat the 300-token budget before the answer is written.
-    model: mistral(process.env.MISTRAL_MODEL || "mistral-medium-latest"),
+    // mistral-small: the cheapest Mistral model that passed all our tests.
+    // (ministral-3b is cheaper but fell for prompt injection in testing.)
+    // Reasoning OFF: reasoning tokens would eat the 300-token budget.
+    model: mistral(process.env.MISTRAL_MODEL || "mistral-small-latest"),
     reasoning: "none",
     instructions: SYSTEM_PROMPT,
     messages: await convertToModelMessages(history),
